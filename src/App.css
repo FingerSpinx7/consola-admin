@@ -1,38 +1,79 @@
-.App {
-  text-align: center;
+/* --- ESTILOS DEL MENÚ --- */
+.menu-nav {
+  background-color: #f4f4f4;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.menu-lista {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  /* ESTA ES LA CLAVE: permite que los botones bajen si no caben */
+  flex-wrap: wrap; 
+  gap: 10px; /* Espacio entre botones */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.menu-link {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  padding: 8px 12px;
+  background-color: white; /* Un fondito blanco a cada botón ayuda */
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* --- ESTILOS DEL INVENTARIO (GRILLA) --- */
+.inventario-grid {
+  display: grid;
+  /* AQUÍ ESTÁ LA MAGIA: 2 columnas del mismo tamaño (1fr 1fr) */
+  grid-template-columns: 1fr 1fr; 
+  gap: 10px; /* Espacio entre tarjetas */
+  padding: 10px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Si la pantalla es muy pequeña (celulares viejos), que sea 1 sola columna */
+@media (max-width: 350px) {
+  .inventario-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Si es PC o Tablet grande, que sean 3 o 4 columnas */
+@media (min-width: 768px) {
+  .inventario-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+/* --- ESTILOS DE LA TARJETA --- */
+.consola-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center; /* Centrar texto */
 }
 
-.App-link {
-  color: #61dafb;
+.card-imagen {
+  width: 100%;
+  height: 120px; /* Más pequeña para que quepan 2 */
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.card-texto {
+  font-size: 0.9rem; /* Texto un pelín más chico */
+  margin: 5px 0;
+  text-align: center;
 }

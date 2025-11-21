@@ -1,25 +1,38 @@
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+import InventarioConsolas from './components/InventarioConsolas';
+import AgregarProducto from './components/AgregarProducto';
+import Menu from './components/Menu';
+import AgregarVenta from './components/AgregarVenta';
+import ConsultarVentas from './components/ConsultarVentas';
+
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      
+      {/* Tu header oscuro (el de la imagen) probablemente vive en App.css 
+        o index.css, déjalo como está.
+      */}
+
+      {/* 4. Coloca el Menú aquí, justo debajo del header */}
+      <Menu />
+
+      <main>
+        {/* 5. 'Routes' decide qué componente mostrar según la URL */}
+        <Routes>
+          {/* Tu página de inventario ahora es la ruta "/" */}
+          <Route path="/" element={<InventarioConsolas />} />
+          
+          {/* Las nuevas rutas */}
+          <Route path="/agregar" element={<AgregarProducto />} />
+          <Route path="/ventas" element={<ConsultarVentas />} />
+          <Route path="/agregar-venta" element={<AgregarVenta />} />
+        </Routes>
+      </main>
     </div>
   );
 }
-
 export default App;
