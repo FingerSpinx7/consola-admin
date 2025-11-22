@@ -14,7 +14,7 @@ function ConsultarVentas() {
   const [fechaFin, setFechaFin] = useState('');
 
   // Cargar ventas al iniciar (opcional: cargar todas o esperar al filtro)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     fetchVentas();
   }, []);

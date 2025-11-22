@@ -1,5 +1,3 @@
-// src/components/AgregarVenta.js
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
@@ -7,38 +5,33 @@ import { useNavigate } from 'react-router-dom';
 function AgregarVenta() {
   const navigate = useNavigate();
 
-  // Estados para el formulario
+  // Estado nuevo: Cliente
+  const [nombreCliente, setNombreCliente] = useState('');
+  
   const [consolasDisponibles, setConsolasDisponibles] = useState([]);
   const [selectedConsolaId, setSelectedConsolaId] = useState('');
   const [precioVenta, setPrecioVenta] = useState('');
-  const [gastosExtra, setGastosExtra] = useState('');
+  const [gastosVenta, setGastosVenta] = useState(''); // Gastos al vender (envío al cliente)
   const [fechaVenta, setFechaVenta] = useState('');
   const [detalles, setDetalles] = useState('');
-  
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- PASO 1: Cargar consolas disponibles al iniciar ---
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     async function fetchConsolasDisponibles() {
+      // AHORA TAMBIÉN TRAEMOS 'gastos_extra_adquisicion' DE LA DB
       const { data, error } = await supabase
         .from('consolas')
-        .select('id, nombre, costo_adquisicion')
-        // ¡Esta es la clave! Solo traer las que están disponibles
+        .select('id, nombre, costo_adquisicion, gastos_extra_adquisicion') 
         .eq('estado', true); 
 
-      if (error) {
-        console.error('Error al cargar consolas:', error);
-        setError('No se pudieron cargar las consolas disponibles.');
-      } else {
-        setConsolasDisponibles(data);
-      }
+      if (error) console.error(error);
+      else setConsolasDisponibles(data);
     }
-    
     fetchConsolasDisponibles();
-  }, []); // El array vacío [] asegura que se ejecute solo una vez
+  }, []);
 
-  // --- PASO 2: Manejar el envío del formulario ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -51,147 +44,87 @@ function AgregarVenta() {
     setCargando(true);
 
     try {
-      // Encontrar la consola seleccionada para obtener su costo
       const consolaVendida = consolasDisponibles.find(
         (c) => c.id === parseInt(selectedConsolaId)
       );
 
-      if (!consolaVendida) {
-        throw new Error('Consola no encontrada.');
-      }
+      // --- CÁLCULO DE GANANCIA ACTUALIZADO ---
+      const costoOriginal = consolaVendida.costo_adquisicion || 0;
+      const gastosDeCompra = consolaVendida.gastos_extra_adquisicion || 0; // Uber, pasaje
+      const gastosDeVenta = parseFloat(gastosVenta) || 0; // Envío, comisiones
+      const precioFinal = parseFloat(precioVenta);
 
-      const costoAdquisicion = consolaVendida.costo_adquisicion;
-      // Usamos || 0 por si el campo 'gastosExtra' está vacío
-      const gastos = parseFloat(gastosExtra) || 0; 
-      const precio = parseFloat(precioVenta);
+      // Ganancia = PrecioVenta - (CostoOriginal + GastosCompra + GastosVenta)
+      const ganancia = precioFinal - (costoOriginal + gastosDeCompra + gastosDeVenta);
 
-      // Cálculo de la ganancia (usando tu columna ganancia_bruta)
-      // Ganancia = Precio de Venta - (Costo de Adquisición + Gastos Extra)
-      const ganancia = precio - (costoAdquisicion + gastos);
-
-      // --- Tarea A: Insertar en la tabla 'ventas' ---
       const { error: ventaError } = await supabase
         .from('ventas')
         .insert({
           consola_id: consolaVendida.id,
-          precio_venta: precio,
-          gastos_extra: gastos,
+          precio_venta: precioFinal,
+          gastos_extra: gastosDeVenta, // Aquí guardamos solo los gastos de la venta
           fecha_venta: fechaVenta,
           detalles_venta: detalles,
-          ganancia_bruta: ganancia, // Guardamos la ganancia calculada
+          nombre_cliente: nombreCliente, // Guardamos el cliente
+          ganancia_bruta: ganancia, 
         });
 
       if (ventaError) throw ventaError;
 
-      // --- Tarea B: Actualizar la consola a 'Vendida' ---
       const { error: updateError } = await supabase
         .from('consolas')
-        .update({ estado: false }) // false = Vendido
+        .update({ estado: false })
         .eq('id', consolaVendida.id);
 
       if (updateError) throw updateError;
 
-      // --- PASO 3: Éxito ---
       setCargando(false);
       alert('¡Venta registrada con éxito!');
-      // Redirigir a la lista de ventas (que haremos después)
       navigate('/ventas'); 
 
     } catch (error) {
-      console.error('Error al registrar la venta:', error);
+      console.error('Error:', error);
       setError(`Error: ${error.message}`);
       setCargando(false);
     }
   };
-  
-  // Estilos (similares al formulario anterior)
-  const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '500px',
-    margin: '20px auto',
-    padding: '20px',
-    border: '1px solid #ddd',
-    borderRadius: '8px'
-  };
 
-  const inputStyle = {
-    marginBottom: '15px',
-    padding: '10px',
-    fontSize: '16px',
-    borderRadius: '4px',
-    border: '1px solid #ccc'
-  };
-
-  const buttonStyle = {
-    padding: '12px',
-    fontSize: '16px',
-    backgroundColor: '#28a745', // Verde para Venta
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
-  };
+  const inputStyle = { marginBottom: '15px', padding: '10px', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div>
+    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center' }}>Registrar Nueva Venta</h2>
-      <form onSubmit={handleSubmit} style={formStyle}>
+      <form onSubmit={handleSubmit}>
         
         <label>Consola a Vender:</label>
-        <select
-          value={selectedConsolaId}
-          onChange={(e) => setSelectedConsolaId(e.target.value)}
-          style={inputStyle}
-          required
-        >
-          <option value="">-- Selecciona una consola --</option>
-          {consolasDisponibles.map((consola) => (
-            <option key={consola.id} value={consola.id}>
-              {consola.nombre} (Costo: ${consola.costo_adquisicion})
+        <select value={selectedConsolaId} onChange={(e) => setSelectedConsolaId(e.target.value)} style={inputStyle} required>
+          <option value="">-- Selecciona --</option>
+          {consolasDisponibles.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nombre} (Costo Base: ${c.costo_adquisicion})
             </option>
           ))}
         </select>
 
-        <label>Precio de Venta (ej. 2000.00):</label>
-        <input
-          type="number"
-          step="0.01"
-          value={precioVenta}
-          onChange={(e) => setPrecioVenta(e.target.value)}
-          style={inputStyle}
-          required
-        />
+        <label>Nombre del Cliente:</label>
+        <input type="text" value={nombreCliente} onChange={(e) => setNombreCliente(e.target.value)} style={inputStyle} required />
+
+        <label>Precio de Venta Final:</label>
+        <input type="number" step="0.01" value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)} style={inputStyle} required />
         
-        <label>Gastos Extra (Envío, comisiones, etc.):</label>
-        <input
-          type="number"
-          step="0.01"
-          value={gastosExtra}
-          onChange={(e) => setGastosExtra(e.target.value)}
-          style={inputStyle}
-        />
+        <label>Gastos de Cierre (Envío, Comisión):</label>
+        <input type="number" step="0.01" value={gastosVenta} onChange={(e) => setGastosVenta(e.target.value)} style={inputStyle} placeholder="0.00" />
 
         <label>Fecha de Venta:</label>
-        <input
-          type="date"
-          value={fechaVenta}
-          onChange={(e) => setFechaVenta(e.target.value)}
-          style={inputStyle}
-          required
-        />
+        <input type="date" value={fechaVenta} onChange={(e) => setFechaVenta(e.target.value)} style={inputStyle} required />
 
-        <label>Detalles de la Venta (Opcional):</label>
-        <textarea
-          value={detalles}
-          onChange={(e) => setDetalles(e.target.value)}
-          style={inputStyle}
-        />
+        <label>Detalles / Notas:</label>
+        <textarea value={detalles} onChange={(e) => setDetalles(e.target.value)} style={inputStyle} />
         
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit" style={buttonStyle} disabled={cargando}>
-          {cargando ? 'Guardando Venta...' : 'Registrar Venta'}
+        <button type="submit" style={{ width: '100%', padding: '10px', background: '#28a745', color: 'white', border: 'none' }} disabled={cargando}>
+          {cargando ? 'Registrando...' : 'Registrar Venta'}
         </button>
       </form>
     </div>

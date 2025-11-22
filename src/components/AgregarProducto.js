@@ -1,30 +1,28 @@
-// src/components/AgregarProducto.js
-
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-// 1. Importar 'useNavigate' para redirigir al usuario
 import { useNavigate } from 'react-router-dom';
 
 function AgregarProducto() {
-  // Hook para redirigir
   const navigate = useNavigate();
 
-  // Estados para cada campo del formulario
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [costo, setCosto] = useState('');
+  
+  // --- NUEVOS CAMPOS ---
+  const [gastosAdq, setGastosAdq] = useState(''); // Gastos extra al comprar (pasaje, envío)
+  const [proveedor, setProveedor] = useState(''); // Quién nos la vendió
+  // --------------------
+
   const [fecha, setFecha] = useState('');
-  const [fotos, setFotos] = useState([]); // Para guardar los archivos de las fotos
+  const [fotos, setFotos] = useState([]); 
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
   
-  // Manejador para la subida de archivos
   const handleFileChange = (e) => {
-    // e.target.files es una lista de archivos
     setFotos(Array.from(e.target.files));
   };
 
-  // Manejador del envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -37,50 +35,44 @@ function AgregarProducto() {
     }
 
     try {
-      // --- PASO 1: Insertar la consola en la tabla 'consolas' ---
-      // (Dejamos el estado 'true' por defecto como en tu tabla)
+      // Insertamos con los NUEVOS DATOS
       const { data: consolaData, error: consolaError } = await supabase
         .from('consolas')
         .insert({
           nombre: nombre,
           descripcion: descripcion,
           costo_adquisicion: parseFloat(costo),
+          // Guardamos lo nuevo:
+          gastos_extra_adquisicion: parseFloat(gastosAdq) || 0,
+          proveedor: proveedor,
           fecha_adquisicion: fecha,
         })
-        .select() // .select() nos devuelve el objeto que acabamos de crear
-        .single(); // .single() nos asegura que solo es un objeto
+        .select()
+        .single();
 
       if (consolaError) throw consolaError;
 
       const nuevaConsolaId = consolaData.id;
 
-      // --- PASO 2: Subir las fotos a Supabase Storage ---
+      // Subida de fotos (esto sigue igual)
       const promesasDeSubida = fotos.map(async (file) => {
-        // Creamos un nombre de archivo único para evitar colisiones
         const filePath = `public/${nuevaConsolaId}-${Date.now()}-${file.name}`;
-        
         const { error: uploadError } = await supabase.storage
-          .from('fotos-consolas') // El nombre de tu bucket
+          .from('fotos-consolas')
           .upload(filePath, file);
-
         if (uploadError) throw uploadError;
-
-        // --- PASO 3: Obtener la URL pública de la foto subida ---
         const { data: urlData } = supabase.storage
           .from('fotos-consolas')
           .getPublicUrl(filePath);
-        
         return urlData.publicUrl;
       });
 
-      // Esperamos a que todas las fotos se suban
       const urlsFotos = await Promise.all(promesasDeSubida);
 
-      // --- PASO 4: Insertar las URLs en la tabla 'fotos' ---
       const fotosParaInsertar = urlsFotos.map((url, index) => ({
         consola_id: nuevaConsolaId,
         url_foto: url,
-        orden: index + 1, // Para saber el orden de las fotos
+        orden: index + 1,
       }));
 
       const { error: fotosError } = await supabase
@@ -89,103 +81,49 @@ function AgregarProducto() {
       
       if (fotosError) throw fotosError;
 
-      // --- PASO 5: Éxito y redirección ---
       setCargando(false);
       alert('¡Consola agregada con éxito!');
-      // Redirigir al inventario
       navigate('/'); 
 
     } catch (error) {
-      console.error('Error al agregar producto:', error);
+      console.error('Error:', error);
       setError(`Error: ${error.message}`);
       setCargando(false);
-      // (Aquí faltaría lógica para borrar la consola si falló la subida de fotos,
-      // pero lo mantenemos simple por ahora)
     }
   };
 
-  // Estilos simples para el formulario (puedes moverlos a CSS)
-  const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '500px',
-    margin: '20px auto',
-    padding: '20px',
-    border: '1px solid #ddd',
-    borderRadius: '8px'
-  };
-
-  const inputStyle = {
-    marginBottom: '15px',
-    padding: '10px',
-    fontSize: '16px',
-    borderRadius: '4px',
-    border: '1px solid #ccc'
-  };
-
-  const buttonStyle = {
-    padding: '12px',
-    fontSize: '16px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer'
-  };
+  // Estilos (puedes reutilizar tus clases CSS si prefieres)
+  const inputStyle = { marginBottom: '15px', padding: '10px', width: '100%', boxSizing: 'border-box' };
 
   return (
-    <div>
+    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
       <h2 style={{ textAlign: 'center' }}>Agregar Nuevo Producto</h2>
-      <form onSubmit={handleSubmit} style={formStyle}>
+      <form onSubmit={handleSubmit}>
         
-        <label>Nombre de la Consola:</label>
-        <input
-          type="text"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          style={inputStyle}
-          required
-        />
+        <label>Nombre:</label>
+        <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} style={inputStyle} required />
+
+        <label>Proveedor :</label>
+        <input type="text" value={proveedor} onChange={(e) => setProveedor(e.target.value)} style={inputStyle} placeholder="Ej. Marketplace, Juan Pérez" />
+
+        <label>Costo de la Consola:</label>
+        <input type="number" step="0.01" value={costo} onChange={(e) => setCosto(e.target.value)} style={inputStyle} required />
+
+        <label>Gastos Extra al Comprar (Uber, Envío):</label>
+        <input type="number" step="0.01" value={gastosAdq} onChange={(e) => setGastosAdq(e.target.value)} style={inputStyle} placeholder="0.00" />
 
         <label>Descripción:</label>
-        <textarea
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          style={inputStyle}
-        />
-
-        <label>Costo de Adquisición (ej. 1500.50):</label>
-        <input
-          type="number"
-          step="0.01" // Permite decimales
-          value={costo}
-          onChange={(e) => setCosto(e.target.value)}
-          style={inputStyle}
-          required
-        />
+        <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} style={inputStyle} />
 
         <label>Fecha de Adquisición:</label>
-        <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          style={inputStyle}
-          required
-        />
+        <input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} style={inputStyle} required />
 
-        <label>Fotos (puedes seleccionar varias):</label>
-        <input
-          type="file"
-          accept="image/*" // Solo acepta imágenes
-          multiple // Permite seleccionar múltiples archivos
-          onChange={handleFileChange}
-          style={inputStyle}
-          required
-        />
+        <label>Fotos:</label>
+        <input type="file" accept="image/*" multiple onChange={handleFileChange} style={inputStyle} required />
 
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit" style={buttonStyle} disabled={cargando}>
+        <button type="submit" style={{ width: '100%', padding: '10px', background: '#007bff', color: 'white', border: 'none' }} disabled={cargando}>
           {cargando ? 'Guardando...' : 'Agregar Producto'}
         </button>
       </form>
