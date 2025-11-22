@@ -7,26 +7,37 @@ import AgregarProducto from './components/AgregarProducto';
 import Menu from './components/Menu';
 import AgregarVenta from './components/AgregarVenta';
 import ConsultarVentas from './components/ConsultarVentas';
+import logoEmpresa from './assets/logo_empresa.png';
 
 
 function App() {
   return (
     <div className="App">
-      
-      {/* Tu header oscuro (el de la imagen) probablemente vive en App.css 
-        o index.css, déjalo como está.
-      */}
+      {/* HEADER PERSONALIZADO */}
+      <header style={{ textAlign: 'center', padding: '20px', backgroundColor: '#282c34' }}>
 
-      {/* 4. Coloca el Menú aquí, justo debajo del header */}
+        {/* Y el nombre de la empresa abajo o al lado */}
+        <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
+          Respawn Tech
+        </h1>
+        
+
+        {/* Aquí va la imagen del logo */}
+        <img 
+          src={logoEmpresa} 
+          alt="Logo Empresa" 
+          style={{ width: '100px', marginTop: '10px' }} // Ajusta el tamaño (width) a tu gusto
+        />
+        
+        
+      </header>
+
       <Menu />
-
+      
       <main>
-        {/* 5. 'Routes' decide qué componente mostrar según la URL */}
+        {/* ... tus rutas siguen igual ... */}
         <Routes>
-          {/* Tu página de inventario ahora es la ruta "/" */}
           <Route path="/" element={<InventarioConsolas />} />
-          
-          {/* Las nuevas rutas */}
           <Route path="/agregar" element={<AgregarProducto />} />
           <Route path="/ventas" element={<ConsultarVentas />} />
           <Route path="/agregar-venta" element={<AgregarVenta />} />
@@ -35,4 +46,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
