@@ -5,7 +5,6 @@ import DetalleModal from './DetalleModal';
 function InventarioConsolas() {
   const [consolas, setConsolas] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [selectedConsola, setSelectedConsola] = useState(null);
 
   useEffect(() => {
@@ -14,6 +13,7 @@ function InventarioConsolas() {
 
   async function fetchConsolas() {
     setLoading(true);
+
     const { data, error } = await supabase
       .from('consolas')
       .select(`
@@ -22,13 +22,37 @@ function InventarioConsolas() {
         ventas(*)`)
       .order('id', { ascending: false });
 
-    if (error) console.error(error);
-    else setConsolas(data);
-    
-    setLoading(false);
+      if (error) {
+        console.error(error);
+      } else {
+        // 2. ORDENAMIENTO INTELIGENTE EN JAVASCRIPT
+        const consolasOrdenadas = data.sort((a, b) => {
+          // --- Lógica para el producto A ---
+          // ¿Tiene venta? Si sí, usamos fecha de venta. Si no, fecha de adquisición.
+          const ventaA = a.ventas && a.ventas.length > 0 ? a.ventas[0] : null;
+          const fechaUltimaActividadA = ventaA ? ventaA.fecha_venta : a.fecha_adquisicion;
+  
+          // --- Lógica para el producto B ---
+          const ventaB = b.ventas && b.ventas.length > 0 ? b.ventas[0] : null;
+          const fechaUltimaActividadB = ventaB ? ventaB.fecha_venta : b.fecha_adquisicion;
+  
+          // --- Comparación ---
+          // Si la fecha A es mayor (más reciente) que B, A va primero (-1)
+          if (fechaUltimaActividadA > fechaUltimaActividadB) return -1;
+          if (fechaUltimaActividadA < fechaUltimaActividadB) return 1;
+  
+          // EMPATE: Si las fechas son iguales (ej. dos movimientos hoy),
+          // desempatamos usando el ID más alto (el último creado va primero)
+          return b.id - a.id;
+        });
+  
+        setConsolas(consolasOrdenadas);
+      }
+      
+      setLoading(false);
   }
 
-  //Funcion lara abrir el modal
+  //Funcion para abrir el modal
   const handleCardClick = (consola) => {
     setSelectedConsola(consola);
   };
