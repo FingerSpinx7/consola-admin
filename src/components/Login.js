@@ -13,7 +13,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+ 
     // Magia de Supabase: Iniciar sesión
     const { error } = await supabase.auth.signInWithPassword({
       email: email,
