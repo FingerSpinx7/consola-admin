@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient'; 
+import DetalleModal from './DetalleModal';
 
 function InventarioConsolas() {
   const [consolas, setConsolas] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [selectedConsola, setSelectedConsola] = useState(null);
 
   useEffect(() => {
     fetchConsolas();
@@ -13,7 +16,10 @@ function InventarioConsolas() {
     setLoading(true);
     const { data, error } = await supabase
       .from('consolas')
-      .select(`*, fotos (id, url_foto)`)
+      .select(`
+        *, 
+        fotos (id, url_foto),
+        ventas(*)`)
       .order('id', { ascending: false });
 
     if (error) console.error(error);
@@ -21,6 +27,16 @@ function InventarioConsolas() {
     
     setLoading(false);
   }
+
+  //Funcion lara abrir el modal
+  const handleCardClick = (consola) => {
+    setSelectedConsola(consola);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setSelectedConsola(null);
+  };
 
   if (loading) return <div style={{padding:'20px', textAlign:'center'}}>Cargando...</div>;
 
@@ -32,7 +48,10 @@ function InventarioConsolas() {
       <div className="inventario-grid">
         
         {consolas.map((consola) => (
-          <div key={consola.id} className="consola-card">
+          <div key={consola.id} className="consola-card"
+          onClick={() => handleCardClick(consola)} //Al dar clic, selecciona
+          style={{ cursor: 'pointer' }} // Pa que cambie la manita
+          >
             
             {/* Imagen */}
             {consola.fotos && consola.fotos.length > 0 ? (
@@ -61,6 +80,14 @@ function InventarioConsolas() {
           </div>
         ))}
       </div>
+
+      {/*Renderizar modal si hay una consola seleccionada*/}
+      {selectedConsola && (
+        <DetalleModal 
+          consola={selectedConsola} 
+          onClose={handleCloseModal} 
+        />
+      )}
     </div>
   );
 }

@@ -53,7 +53,7 @@ function App() {
     <div className="App">
       <header style={{ textAlign: 'center', padding: '20px', backgroundColor: '#282c34', position: 'relative' }}>
         <img src={logoEmpresa} alt="Logo" style={{ width: '60px', marginBottom: '5px' }} />
-        <h1 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Nombre de la Empresa</h1>
+        <h1 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Respawn Tech</h1>
         
         {/* Botón de Salir (Pequeño, esquina derecha) */}
         <button 
