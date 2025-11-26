@@ -52,6 +52,11 @@ function InventarioConsolas() {
       setLoading(false);
   }
 
+  //Manejador de UPDATES
+  const handleUpdateSuccess = () => {
+    fetchConsolas(); // Recarga la lista para ver los cambios
+    setSelectedConsola(null); // Cierra el modal
+  };
   //Funcion para abrir el modal
   const handleCardClick = (consola) => {
     setSelectedConsola(consola);
@@ -110,6 +115,8 @@ function InventarioConsolas() {
         <DetalleModal 
           consola={selectedConsola} 
           onClose={handleCloseModal} 
+          //Funcion UPDATE
+          onUpdate={handleUpdateSuccess}
         />
       )}
     </div>
