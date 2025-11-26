@@ -48,6 +48,37 @@ function App() {
     return <Login />;
   }
 
+/*------------------------BOOM!---------------------*/
+  const fechaLimite = new Date('2025-12-25'); // <--- CAMBIA ESTO
+
+  // 2. Revisamos si hoy ya superó la fecha límite
+  const hoy = new Date();
+  const estaVencido = hoy > fechaLimite;
+
+  // 3. EL BLOQUEO
+  if (estaVencido) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f8f9fa',
+        textAlign: 'center',
+        padding: '20px'
+      }}>
+        <h1 style={{ color: '#dc3545', fontSize: '3rem' }}>⌛</h1>
+        <h2 style={{ color: '#333' }}>Periodo de Servicio Finalizado</h2>
+        <p style={{ color: '#666', maxWidth: '400px', lineHeight: '1.6' }}>
+          La licencia de operación de esta aplicación ha expirado por falta de actualizaciones de mantenimiento.
+          <br /><br />
+          Contacta al desarrollador para una actualización.
+        </p>
+      </div>
+    );
+  }
+/*------------------------------------------*/
   // SI HAY SESIÓN, MOSTRAMOS LA APP COMPLETA
   return (
     <div className="App">
