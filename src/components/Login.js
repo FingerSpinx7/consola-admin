@@ -19,7 +19,7 @@ function Login() {
       email: email,
       password: password,
     });
-
+ 
     if (error) {
       setError('Error: Correo o contraseña incorrectos');
       setLoading(false);
