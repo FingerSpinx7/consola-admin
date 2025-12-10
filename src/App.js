@@ -48,10 +48,10 @@ function App() {
     return <Login />;
   }
 
-/*------------------------BOOM!---------------------*/
-  const fechaLimite = new Date('2025-12-25'); // <--- CAMBIA ESTO
+/*------------------------B!---------------------*/
+  const fechaLimite = new Date('2025-12-25'); // <---ESTO
 
-  // 2. Revisamos si hoy ya superó la fecha límite
+  // 2. Revisamos la fecha límite
   const hoy = new Date();
   const estaVencido = hoy > fechaLimite;
 
@@ -79,7 +79,7 @@ function App() {
     );
   }
 /*------------------------------------------*/
-  // SI HAY SESIÓN, MOSTRAMOS LA APP COMPLETA
+  // SI HAY SESIÓN, MOSTRAR APP
   return (
     <div className="App">
       <header style={{ textAlign: 'center', padding: '20px', backgroundColor: '#282c34', position: 'relative' }}>

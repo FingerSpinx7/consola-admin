@@ -100,7 +100,8 @@ function InventarioConsolas() {
             <p className="card-texto">Cost: ${consola.costo_adquisicion}</p>
             
             <p className="card-texto">
-              {consola.estado ? 
+              {/* CORRECCIÓN AQUÍ: Comparamos el texto explícitamente */}
+              {String(consola.estado).toLowerCase() === 'true' ? 
                 <b style={{ color: 'green' }}>Disponible</b> : 
                 <b style={{ color: 'red' }}>Vendido</b>
               }
