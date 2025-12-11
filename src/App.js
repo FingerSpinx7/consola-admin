@@ -1,4 +1,5 @@
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect} from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { supabase } from './supabaseClient';
@@ -48,10 +49,10 @@ function App() {
     return <Login />;
   }
 
-/*------------------------BOOM!---------------------*/
-  const fechaLimite = new Date('2025-12-25'); // <--- CAMBIA ESTO
+/*------------------------B!---------------------*/
+  const fechaLimite = new Date('2025-12-25'); // <---ESTO
 
-  // 2. Revisamos si hoy ya superó la fecha límite
+  // 2. Revisamos la fecha límite
   const hoy = new Date();
   const estaVencido = hoy > fechaLimite;
 
@@ -79,14 +80,20 @@ function App() {
     );
   }
 /*------------------------------------------*/
-  // SI HAY SESIÓN, MOSTRAMOS LA APP COMPLETA
+  // SI HAY SESIÓN, MOSTRAR APP
   return (
     <div className="App">
-      <header style={{ textAlign: 'center', padding: '20px', backgroundColor: '#282c34', position: 'relative' }}>
+      <header style={{ 
+        textAlign: 'center', 
+        padding: '20px', 
+        backgroundColor: '#282c34', 
+        position: 'relative',
+        paddingLeft: '60px' // Espacio para el botón hamburguesa
+      }}>
         <img src={logoEmpresa} alt="Logo" style={{ width: '60px', marginBottom: '5px' }} />
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Respawn Tech</h1>
         
-        {/* Botón de Salir (Pequeño, esquina derecha) */}
+        {/* Botón de Salir */}
         <button 
           onClick={handleLogout}
           style={{
@@ -105,10 +112,11 @@ function App() {
           Salir
         </button>
       </header>
-
+  
+      {/* El menú ahora se renderiza aquí */}
       <Menu />
       
-      <main>
+      <main style={{ padding: '20px' }}>
         <Routes>
           <Route path="/" element={<InventarioConsolas />} />
           <Route path="/agregar" element={<AgregarProducto />} />

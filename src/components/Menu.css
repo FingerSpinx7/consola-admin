@@ -1,0 +1,175 @@
+/* Botón Hamburguesa */
+.menu-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: white;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+    padding: 2px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .menu-toggle.open span:nth-child(1),
+  .menu-toggle.open span:nth-child(2),
+  .menu-toggle.open span:nth-child(3) {
+  opacity: 0; 
+  }
+  
+  .menu-toggle.open span:nth-child(1){
+    transform: translateY(-5px);
+  }
+  
+  .menu-toggle.open span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+  
+  /* Overlay (fondo oscuro) */
+  .menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Sidebar */
+  .menu-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px; /* Escondido por defecto */
+    width: 280px;
+    height: 100vh;
+    background: #1e1e1e;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+  
+  .menu-sidebar.open {
+    left: 0; /* Se desliza hacia adentro */
+  }
+  
+  /* Header del menú */
+  .menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: #282c34;
+    border-bottom: 1px solid #444;
+  }
+  
+  .menu-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+  
+  .menu-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+  
+  .menu-close:hover {
+    transform: rotate(90deg);
+  }
+  
+  /* Lista del menú */
+  .menu-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .menu-lista li {
+    border-bottom: 1px solid #333;
+  }
+  
+  .menu-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px 20px;
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+  }
+  
+  .menu-link:hover {
+    background: #2a2a2a;
+    color: #61dafb;
+    padding-left: 25px;
+  }
+  
+  .menu-icon {
+    font-size: 1.3rem;
+    min-width: 25px;
+    text-align: center;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .menu-sidebar {
+      width: 250px;
+      left: -250px;
+    }
+  }
+
+  /* 1. Fuerza el color blanco o claro en los enlaces del menú */
+.menu-lista .menu-link {
+  /* El color de tus enlaces (blanco o un gris muy claro) */
+  color: #f8f9fa !important; 
+}
+
+/* 2. Arregla el color de los íconos (que también son enlaces) */
+.menu-icon svg {
+  /* Para asegurarte de que los íconos (SVG) también sean claros */
+  fill: #f8f9fa !important; 
+}
+
+/* (hover) */
+.menu-lista .menu-link:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Un fondo gris tenue al pasar el mouse */
+  color: #ffffff !important;
+}
