@@ -1,4 +1,5 @@
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState, useEffect} from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { supabase } from './supabaseClient';
@@ -82,11 +83,17 @@ function App() {
   // SI HAY SESIÓN, MOSTRAR APP
   return (
     <div className="App">
-      <header style={{ textAlign: 'center', padding: '20px', backgroundColor: '#282c34', position: 'relative' }}>
+      <header style={{ 
+        textAlign: 'center', 
+        padding: '20px', 
+        backgroundColor: '#282c34', 
+        position: 'relative',
+        paddingLeft: '60px' // Espacio para el botón hamburguesa
+      }}>
         <img src={logoEmpresa} alt="Logo" style={{ width: '60px', marginBottom: '5px' }} />
         <h1 style={{ color: 'white', margin: 0, fontSize: '1.2rem' }}>Respawn Tech</h1>
         
-        {/* Botón de Salir (Pequeño, esquina derecha) */}
+        {/* Botón de Salir */}
         <button 
           onClick={handleLogout}
           style={{
@@ -105,10 +112,11 @@ function App() {
           Salir
         </button>
       </header>
-
+  
+      {/* El menú ahora se renderiza aquí */}
       <Menu />
       
-      <main>
+      <main style={{ padding: '20px' }}>
         <Routes>
           <Route path="/" element={<InventarioConsolas />} />
           <Route path="/agregar" element={<AgregarProducto />} />
