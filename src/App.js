@@ -11,7 +11,7 @@ import Menu from './components/Menu';
 import AgregarVenta from './components/AgregarVenta';
 import ConsultarVentas from './components/ConsultarVentas';
 import logoEmpresa from './assets/logo_empresa.png';
-import Login from './components/Login';
+import Login from './components/Login'; 
 
 function App() {
   // Estado para guardar la sesión
